@@ -1,0 +1,15 @@
+{
+  "name": "translator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "start.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marie",
+  "license": "ISC",
+  "dependencies": {
+    "cld": "^2.7.1",
+    "discord.js": "^13.6.0"
+  }
+}
