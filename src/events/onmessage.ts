@@ -4,6 +4,8 @@ import { NotBot } from '@discordx/utilities';
 import cld from 'cld';
 import axios from 'axios';
 
+const locales: Set<String> = new Set(['EN', 'NL', 'DE', 'SV', 'FI', 'RU', 'BG', 'RO', 'IT', 'FR']);
+
 @Discord()
 export class Events {
     @On("messageCreate")
@@ -47,7 +49,7 @@ export class Events {
                     }
                 });
 
-                if (response.data.translations[0].detected_source_language == 'NL' || response.data.translations[0].detected_source_language == 'DE' ||  response.data.translations[0].detected_source_language == 'RO' || response.data.translations[0].detected_source_language == 'BG' || response.data.translations[0].detected_source_language == 'IT' || response.data.translations[0].detected_source_language == 'FR' && response.data.translations[0].text != message.content || response.data.translations[0].detected_source_language == 'SV' || response.data.translations[0].detected_source_language == 'FI' || response.data.translations[0].detected_source_language == 'RU') {
+                if (locales.has(response.data.translations[0].detected_source_language) && response.data.translations[0].text != message.content) {
                     message.channel.sendTyping();
                     message.channel.send(response.data.translations[0].text);
                 } else if (response.data.translations[0].detected_source_language == 'EN') {
