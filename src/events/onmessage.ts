@@ -11,7 +11,7 @@ import type { ArgsOf } from 'discordx';
 import { NotBot } from '@discordx/utilities';
 import cld from 'cld';
 import axios from 'axios';
-import type { TextChannel } from 'discord.js';
+import { TextChannel, WebhookClient } from 'discord.js';
 
 //@ts-expect-error
 let data = JSON.parse(fs.readFileSync(`${__dirname}/../data.json`));
@@ -28,8 +28,6 @@ export class Events {
 
         cld.detect(message.content).then(async result => {
             if (result.languages.filter(language => language.code != 'en').length > 0) {
-                message.channel.sendTyping();
-
                 const response = await axios({
                     url: 'https://api-free.deepl.com/v2/translate',
                     method: 'post',
@@ -44,7 +42,7 @@ export class Events {
                 });
 
                 if (!data.webhooks.filter(hook => hook.channel == message.channelId).length) {
-                    (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(webhook => {
+                    await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
                         data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
 
                         fs.writeFileSync(`${__dirname}/../data.json`, JSON.stringify(data));
@@ -54,7 +52,15 @@ export class Events {
                 if (result.languages.filter(language => language.code != 'en' && language.code != response.data.translations[0].detected_source_language.toLowerCase()).length > 0) {
                     message.channel.send('This language is not supported by DeepL')
                 } else {
-                    message.channel.send(response.data.translations[0].text);
+                    const currenthook = data.webhooks.filter(hook => hook.channel == message.channelId)[0];
+
+                    const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
+
+                    webhookClient.send({
+                        content: response.data.translations[0].text,
+                        username: message.author.username,
+                        avatarURL: message.author.displayAvatarURL(),
+                    });
                 }
             }
         }).catch(async (e: Error) => {
@@ -73,8 +79,23 @@ export class Events {
                 });
 
                 if (locales.has(response.data.translations[0].detected_source_language) && response.data.translations[0].text != message.content) {
-                    message.channel.sendTyping();
-                    message.channel.send(response.data.translations[0].text);
+                    if (!data.webhooks.filter(hook => hook.channel == message.channelId).length) {
+                        await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
+                            data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
+    
+                            fs.writeFileSync(`${__dirname}/../data.json`, JSON.stringify(data));
+                        })
+                    }
+
+                    const currenthook = data.webhooks.filter(hook => hook.channel == message.channelId)[0];
+
+                    const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
+
+                    webhookClient.send({
+                        content: response.data.translations[0].text,
+                        username: message.author.username,
+                        avatarURL: message.author.displayAvatarURL(),
+                    });
                 } else if (response.data.translations[0].detected_source_language == 'EN') {
                     return
                 }
