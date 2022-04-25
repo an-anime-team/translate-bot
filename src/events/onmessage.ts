@@ -30,6 +30,11 @@ export class Events {
         if (message.channel.type == 'DM') return;
         if (data.disabled.includes(message.channelId)) return;
 
+        if (message.content.length > 2000) {
+            message.channel.send('Your message is too long it has to be below 2000 characters');
+            return;
+        }
+        
         cld.detect(message.content).then(async result => {
             if (result.languages.filter(language => language.code != 'en').length > 0) {
                 const response = await axios({
