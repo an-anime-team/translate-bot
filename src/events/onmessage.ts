@@ -24,6 +24,8 @@ export class Events {
     @Guard(NotBot)
     async onMessage([message]: ArgsOf<"messageCreate">): Promise<void> {
         if (message.channel.type == 'DM') return;
+        if (data.disabled.includes(message.channelId)) return;
+
         cld.detect(message.content).then(async result => {
             if (result.languages.filter(language => language.code != 'en').length > 0) {
                 message.channel.sendTyping();
