@@ -61,7 +61,7 @@ export class Events {
                 }
 
                 if (result.languages.filter(language => language.code != 'en' && language.code != response.data.translations[0].detected_source_language.toLowerCase()).length > 0) {
-                    message.channel.send('This language is not supported by DeepL')
+                    return;
                 } else {
                     const currenthook = data.webhooks.filter(hook => hook.channel == message.channelId)[0];
 
