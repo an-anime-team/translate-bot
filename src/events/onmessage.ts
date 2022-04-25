@@ -47,7 +47,7 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content.replaceAll(mention, '').replaceAll(/@everyone|@here/gi, ''),
+                        text: message.content.replaceAll(mention, ''),
                         target_lang: 'EN'
                     }
                 });
@@ -70,7 +70,8 @@ export class Events {
                     webhookClient.send({
                         content: response.data.translations[0].text,
                         username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
-                        avatarURL: message.author.displayAvatarURL()
+                        avatarURL: message.author.displayAvatarURL(),
+                        allowedMentions: { "parse": [], repliedUser: false }
                     });
                 }
             }
@@ -84,7 +85,7 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content.replaceAll(mention, '').replaceAll(/@everyone|@here/gi, ''),
+                        text: message.content.replaceAll(mention, ''),
                         target_lang: 'EN'
                     }
                 });
@@ -106,6 +107,7 @@ export class Events {
                         content: response.data.translations[0].text,
                         username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
                         avatarURL: message.author.displayAvatarURL(),
+                        allowedMentions: { "parse": [], repliedUser: false }
                     });
                 } else if (response.data.translations[0].detected_source_language == 'EN') {
                     return
