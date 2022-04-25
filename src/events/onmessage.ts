@@ -20,6 +20,8 @@ const languageNames = new Intl.DisplayNames(['en'], {
 //@ts-expect-error
 let data = JSON.parse(fs.readFileSync(`${__dirname}/../data.json`));
 
+let mention = /<@(.*?)>/;
+
 const locales: Set<String> = new Set(['EN', 'NL', 'DE', 'SV', 'FI', 'RU', 'BG', 'RO', 'IT', 'FR']);
 
 @Discord()
@@ -45,7 +47,7 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content,
+                        text: message.content.replaceAll(mention, ''),
                         target_lang: 'EN'
                     }
                 });
@@ -69,6 +71,7 @@ export class Events {
                         content: response.data.translations[0].text,
                         username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
                         avatarURL: message.author.displayAvatarURL(),
+                        allowedMentions: { parse: ['users'], repliedUser: true }
                     });
                 }
             }
@@ -82,7 +85,7 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content,
+                        text: message.content.replaceAll(mention, ''),
                         target_lang: 'EN'
                     }
                 });
