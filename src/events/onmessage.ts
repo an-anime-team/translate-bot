@@ -20,7 +20,7 @@ const languageNames = new Intl.DisplayNames(['en'], {
 //@ts-expect-error
 let data = JSON.parse(fs.readFileSync(`${__dirname}/../data.json`));
 
-let mention = /<@(.*?)>/;
+let mention = /<@(.*?)>/g;
 
 const locales: Set<String> = new Set(['EN', 'NL', 'DE', 'SV', 'FI', 'RU', 'BG', 'RO', 'IT', 'FR']);
 
@@ -32,7 +32,7 @@ export class Events {
         if (message.channel.type == 'DM') return;
         if (data.disabled.includes(message.channelId)) return;
 
-        if (message.content.length > 2000) {
+        if (message.content.length > 1999) {
             message.channel.send('Your message is too long it has to be below 2000 characters');
             return;
         }
