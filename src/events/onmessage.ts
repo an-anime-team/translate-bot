@@ -70,8 +70,7 @@ export class Events {
                     webhookClient.send({
                         content: response.data.translations[0].text,
                         username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
-                        avatarURL: message.author.displayAvatarURL(),
-                        allowedMentions: { parse: ['users'], repliedUser: true }
+                        avatarURL: message.author.displayAvatarURL()
                     });
                 }
             }
