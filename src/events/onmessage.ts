@@ -47,7 +47,7 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content.replaceAll(mention, ''),
+                        text: message.content.replaceAll(mention, '').replaceAll(/@everyone|@here/gi, ''),
                         target_lang: 'EN'
                     }
                 });
@@ -84,7 +84,7 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content.replaceAll(mention, ''),
+                        text: message.content.replaceAll(mention, '').replaceAll(/@everyone|@here/gi, ''),
                         target_lang: 'EN'
                     }
                 });
