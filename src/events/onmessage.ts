@@ -13,6 +13,10 @@ import cld from 'cld';
 import axios from 'axios';
 import { TextChannel, WebhookClient } from 'discord.js';
 
+const languageNames = new Intl.DisplayNames(['en'], {
+    type: 'language'
+});
+
 //@ts-expect-error
 let data = JSON.parse(fs.readFileSync(`${__dirname}/../data.json`));
 
@@ -58,7 +62,7 @@ export class Events {
 
                     webhookClient.send({
                         content: response.data.translations[0].text,
-                        username: message.author.username,
+                        username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
                         avatarURL: message.author.displayAvatarURL(),
                     });
                 }
@@ -93,7 +97,7 @@ export class Events {
 
                     webhookClient.send({
                         content: response.data.translations[0].text,
-                        username: message.author.username,
+                        username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
                         avatarURL: message.author.displayAvatarURL(),
                     });
                 } else if (response.data.translations[0].detected_source_language == 'EN') {
