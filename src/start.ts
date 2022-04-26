@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { Client } from "discordx";
 import { Intents } from "discord.js";
 import { dirname, importx } from "@discordx/importer";
+import type { Interaction } from "discord.js";
 
 export class Main {
     private static _client: Client;
@@ -21,8 +22,21 @@ export class Main {
         silent: false,
       });
   
-      this.Client.on("ready", () => {
+      this.Client.on("ready", async () => {
         console.log("Bot started...");
+
+        // Cache Guilds
+        await this.Client.guilds.fetch();
+
+        // Synchronize applications commands with Discord
+        await this.Client.initApplicationCommands();
+
+        // Synchronize applications command permissions with Discord
+        await this.Client.initApplicationPermissions();
+      });
+
+      this.Client.on("interactionCreate", (interaction: Interaction) => {
+        this.Client.executeInteraction(interaction);
       });
   
       await importx(dirname(import.meta.url) + "/commands/**/*.{js,ts}");

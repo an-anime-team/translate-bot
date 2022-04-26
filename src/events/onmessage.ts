@@ -31,6 +31,7 @@ export class Events {
     async onMessage([message]: ArgsOf<"messageCreate">): Promise<void> {
         if (message.channel.type == 'DM') return;
         if (data.disabled.includes(message.channelId)) return;
+        if (data.blockedusers.includes(message.author.id)) return;
 
         if (message.content.length > 1999) {
             message.channel.send('Your message is too long it has to be below 2000 characters');
@@ -51,6 +52,8 @@ export class Events {
                         target_lang: 'EN'
                     }
                 });
+
+                if (response.data.translations[0].text == message.content) return;
 
                 if (!data.webhooks.filter(hook => hook.channel == message.channelId).length) {
                     await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
