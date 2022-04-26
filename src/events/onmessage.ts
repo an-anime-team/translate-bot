@@ -1,24 +1,17 @@
-// Node imports and defining due to ESNext and Module settings
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 // Discord and other libraries
+import { TextChannel, WebhookClient } from 'discord.js';
 import { Discord, Guard, On } from 'discordx';
 import type { ArgsOf } from 'discordx';
 import { NotBot } from '@discordx/utilities';
+import { dirname } from "@discordx/importer";
 import cld from 'cld';
 import axios from 'axios';
-import { TextChannel, WebhookClient } from 'discord.js';
+import fs from 'fs';
+import { Main } from '../start.js';
 
 const languageNames = new Intl.DisplayNames(['en'], {
     type: 'language'
 });
-
-//@ts-expect-error
-let data = JSON.parse(fs.readFileSync(`${__dirname}/../data.json`));
 
 const locales: Set<String> = new Set(['EN', 'NL', 'DE', 'SV', 'FI', 'RU', 'BG', 'RO', 'IT', 'FR', 'PL']);
 
@@ -28,8 +21,8 @@ export class Events {
     @Guard(NotBot)
     async onMessage([message]: ArgsOf<"messageCreate">): Promise<void> {
         if (message.channel.type == 'DM') return;
-        if (data.disabled.includes(message.channelId)) return;
-        if (data.blockedusers.includes(message.author.id)) return;
+        if (Main.Data.disabled.includes(message.channelId)) return;
+        if (Main.Data.blockedusers.includes(message.author.id)) return;
 
         if (message.content.length > 1999) {
             message.channel.send('Your message is too long it has to be below 2000 characters');
@@ -53,18 +46,18 @@ export class Events {
 
                 if (response.data.translations[0].text == message.content) return;
 
-                if (!data.webhooks.filter(hook => hook.channel == message.channelId).length) {
+                if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
                     await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
-                        data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
+                        Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
 
-                        fs.writeFileSync(`${__dirname}/../data.json`, JSON.stringify(data));
+                        fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
                     })
                 }
 
                 if (result.languages.filter(language => language.code != 'en' && language.code != response.data.translations[0].detected_source_language.toLowerCase()).length > 0) {
                     return;
                 } else {
-                    const currenthook = data.webhooks.filter(hook => hook.channel == message.channelId)[0];
+                    const currenthook = Main.Data.webhooks.filter(hook => hook.channel == message.channelId)[0];
 
                     const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
 
@@ -92,15 +85,15 @@ export class Events {
                 });
 
                 if (locales.has(response.data.translations[0].detected_source_language) && response.data.translations[0].text != message.content) {
-                    if (!data.webhooks.filter(hook => hook.channel == message.channelId).length) {
+                    if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
                         await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
-                            data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
+                            Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
     
-                            fs.writeFileSync(`${__dirname}/../data.json`, JSON.stringify(data));
+                            fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
                         })
                     }
 
-                    const currenthook = data.webhooks.filter(hook => hook.channel == message.channelId)[0];
+                    const currenthook = Main.Data.webhooks.filter(hook => hook.channel == message.channelId)[0];
 
                     const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
 
