@@ -20,8 +20,6 @@ const languageNames = new Intl.DisplayNames(['en'], {
 //@ts-expect-error
 let data = JSON.parse(fs.readFileSync(`${__dirname}/../data.json`));
 
-let mention = /<@(.*?)>/g;
-
 const locales: Set<String> = new Set(['EN', 'NL', 'DE', 'SV', 'FI', 'RU', 'BG', 'RO', 'IT', 'FR', 'PL']);
 
 @Discord()
@@ -48,12 +46,12 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content.replaceAll(mention, ''),
+                        text: message.content,
                         target_lang: 'EN'
                     }
                 });
 
-                if (response.data.translations[0].text == message.content || response.data.translations[0].text == message.content.replaceAll(mention, '')) return;
+                if (response.data.translations[0].text == message.content) return;
 
                 if (!data.webhooks.filter(hook => hook.channel == message.channelId).length) {
                     await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
@@ -88,12 +86,12 @@ export class Events {
                     },
                     params: {
                         auth_key: process.env.auth,
-                        text: message.content.replaceAll(mention, ''),
+                        text: message.content,
                         target_lang: 'EN'
                     }
                 });
 
-                if (locales.has(response.data.translations[0].detected_source_language) && response.data.translations[0].text != message.content || locales.has(response.data.translations[0].detected_source_language)  && response.data.translations[0].text != message.content.replaceAll(mention, '')) {
+                if (locales.has(response.data.translations[0].detected_source_language) && response.data.translations[0].text != message.content) {
                     if (!data.webhooks.filter(hook => hook.channel == message.channelId).length) {
                         await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
                             data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
