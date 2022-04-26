@@ -12,7 +12,8 @@
     "importHelpers": true, // required
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "Node", // required
-    "esModuleInterop": true // required
+    "esModuleInterop": true, // required
+    "removeComments": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
