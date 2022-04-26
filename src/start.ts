@@ -23,8 +23,6 @@ export class Main {
       });
   
       this.Client.on("ready", async () => {
-        console.log("Bot started...");
-
         // Cache Guilds
         await this.Client.guilds.fetch();
 
@@ -33,6 +31,8 @@ export class Main {
 
         // Synchronize applications command permissions with Discord
         await this.Client.initApplicationPermissions();
+
+        console.log("Bot started...");
       });
 
       this.Client.on("interactionCreate", (interaction: Interaction) => {
