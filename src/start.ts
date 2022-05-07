@@ -38,8 +38,8 @@ export class Main {
         // Synchronize applications commands with Discord
         await this.Client.initApplicationCommands();
 
-        // Synchronize applications command permissions with Discord
-        await this.Client.initApplicationPermissions();
+        // Synchronize applications command permissions with Discord (Discord API update broke this for now)
+        //await this.Client.initApplicationPermissions();
 
         console.log("Bot started...");
       });
