@@ -8,12 +8,22 @@ import cld from 'cld';
 import axios from 'axios';
 import fs from 'fs';
 import { Main } from '../start.js';
+import compareStrings from '../compare_strings.js';
 
 const languageNames = new Intl.DisplayNames(['en'], {
     type: 'language'
 });
 
 const locales: Set<String> = new Set(['EN', 'NL', 'DE', 'SV', 'FI', 'RU', 'BG', 'RO', 'IT', 'FR', 'PL']);
+
+const blocked_words: Set<String> = new Set([
+    'damn',
+    'nope'
+]);
+
+// Some tests shown that 0.93 is average limit for similar translations
+// like "HAHA" -> "HAHAHA", so I decided to make it 0.92 here
+const STRINGS_SIMILARITY_LIMIT = 0.92;
 
 @Discord()
 export class Events {
@@ -26,6 +36,11 @@ export class Events {
 
         if (message.content.length > 1999) {
             message.channel.send('Your message is too long it has to be below 2000 characters');
+            return;
+        }
+
+        // Don't translate what doesn't need to be translated
+        if (blocked_words.has(message.content.toLowerCase())) {
             return;
         }
         
@@ -44,7 +59,9 @@ export class Events {
                     }
                 });
 
-                if (response.data.translations[0].text == message.content) return;
+                // Don't send translation if it's pretty similar with original text
+                if (compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)
+                    return;
 
                 if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
                     await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
