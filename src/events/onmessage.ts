@@ -102,6 +102,10 @@ export class Events {
                 });
 
                 if (locales.has(response.data.translations[0].detected_source_language) && response.data.translations[0].text != message.content) {
+                    // Don't send translation if it's pretty similar with original text
+                    if (compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)
+                        return;
+
                     if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
                         await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
                             Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
