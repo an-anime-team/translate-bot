@@ -60,30 +60,30 @@ export class Events {
                 });
 
                 // Don't send translation if it's pretty similar with original text
-                if (compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)
-                    return;
+                if (!(compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)) {
 
-                if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
-                    await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
-                        Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
+                    if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
+                        await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
+                            Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
 
-                        fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
-                    })
-                }
+                            fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
+                        })
+                    }
 
-                if (result.languages.filter(language => language.code != 'en' && language.code != response.data.translations[0].detected_source_language.toLowerCase()).length > 0) {
-                    return;
-                } else {
-                    const currenthook = Main.Data.webhooks.filter(hook => hook.channel == message.channelId)[0];
+                    if (result.languages.filter(language => language.code != 'en' && language.code != response.data.translations[0].detected_source_language.toLowerCase()).length > 0) {
+                        return;
+                    } else {
+                        const currenthook = Main.Data.webhooks.filter(hook => hook.channel == message.channelId)[0];
 
-                    const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
+                        const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
 
-                    webhookClient.send({
-                        content: response.data.translations[0].text,
-                        username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
-                        avatarURL: message.author.displayAvatarURL(),
-                        allowedMentions: { "parse": [], repliedUser: false }
-                    });
+                        webhookClient.send({
+                            content: response.data.translations[0].text,
+                            username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
+                            avatarURL: message.author.displayAvatarURL(),
+                            allowedMentions: { "parse": [], repliedUser: false }
+                        });
+                    }
                 }
             }
         }).catch(async (e: Error) => {
@@ -103,27 +103,27 @@ export class Events {
 
                 if (locales.has(response.data.translations[0].detected_source_language) && response.data.translations[0].text != message.content) {
                     // Don't send translation if it's pretty similar with original text
-                    if (compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)
-                        return;
+                    if (!(compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)) {
 
-                    if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
-                        await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
-                            Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
-    
-                            fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
-                        })
+                        if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
+                            await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
+                                Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
+        
+                                fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
+                            })
+                        }
+
+                        const currenthook = Main.Data.webhooks.filter(hook => hook.channel == message.channelId)[0];
+
+                        const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
+
+                        webhookClient.send({
+                            content: response.data.translations[0].text,
+                            username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
+                            avatarURL: message.author.displayAvatarURL(),
+                            allowedMentions: { "parse": [], repliedUser: false }
+                        });
                     }
-
-                    const currenthook = Main.Data.webhooks.filter(hook => hook.channel == message.channelId)[0];
-
-                    const webhookClient = new WebhookClient({ id: currenthook.id, token: currenthook.token });
-
-                    webhookClient.send({
-                        content: response.data.translations[0].text,
-                        username: `${message.author.username} (${languageNames.of(response.data.translations[0].detected_source_language)})`,
-                        avatarURL: message.author.displayAvatarURL(),
-                        allowedMentions: { "parse": [], repliedUser: false }
-                    });
                 } else if (response.data.translations[0].detected_source_language == 'EN') {
                     return
                 }
