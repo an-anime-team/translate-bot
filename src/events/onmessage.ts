@@ -18,7 +18,8 @@ const locales: Set<String> = new Set(['EN', 'NL', 'DE', 'SV', 'FI', 'RU', 'BG', 
 
 const blocked_words: Set<String> = new Set([
     'damn',
-    'nope'
+    'nope',
+    'i dont'
 ]);
 
 // Some tests shown that 0.93 is average limit for similar translations
