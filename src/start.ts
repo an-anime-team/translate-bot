@@ -1,8 +1,7 @@
 import "reflect-metadata";
 import { Client } from "discordx";
-import { Intents } from "discord.js";
+import { IntentsBitField } from "discord.js";
 import { dirname, importx } from "@discordx/importer";
-import type { Interaction } from "discord.js";
 import fs from "fs";
 
 //@ts-expect-error
@@ -23,10 +22,11 @@ export class Main {
       this._client = new Client({
         botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
         intents: [
-          Intents.FLAGS.GUILDS,
-          Intents.FLAGS.GUILD_MESSAGES,
-          Intents.FLAGS.GUILD_MEMBERS,
-          Intents.FLAGS.GUILD_WEBHOOKS
+          IntentsBitField.Flags.Guilds,
+          IntentsBitField.Flags.GuildMessages,
+          IntentsBitField.Flags.GuildMembers,
+          IntentsBitField.Flags.GuildWebhooks,
+          IntentsBitField.Flags.MessageContent
         ],
         silent: false,
       });
@@ -44,7 +44,7 @@ export class Main {
         console.log("Bot started...");
       });
 
-      this.Client.on("interactionCreate", (interaction: Interaction) => {
+      this.Client.on("interactionCreate", (interaction) => {
         this.Client.executeInteraction(interaction);
       });
   

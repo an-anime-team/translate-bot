@@ -1,5 +1,5 @@
 // Discord and other libraries
-import { TextChannel, WebhookClient } from 'discord.js';
+import { TextChannel, ChannelType, WebhookClient } from 'discord.js';
 import { Discord, Guard, On } from 'discordx';
 import type { ArgsOf } from 'discordx';
 import { NotBot } from '@discordx/utilities';
@@ -28,13 +28,12 @@ const STRINGS_SIMILARITY_LIMIT = 0.92;
 
 @Discord()
 export class Events {
-    @On("messageCreate")
+    @On({ event: "messageCreate" })
     @Guard(NotBot)
     async onMessage([message]: ArgsOf<"messageCreate">): Promise<void> {
-        if (message.channel.type == 'DM') return;
+        if (message.channel.type == ChannelType.DM) return;
         if (Main.Data.disabled.includes(message.channelId)) return;
         if (Main.Data.blockedusers.includes(message.author.id)) return;
-
         if (message.content.length > 1999) {
             message.channel.send('Your message is too long it has to be below 2000 characters');
             return;
@@ -64,7 +63,7 @@ export class Events {
                 if (!(compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)) {
 
                     if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
-                        await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
+                        await (message.channel as TextChannel).createWebhook({ name: `Webhook #${message.channelId}` }).then(async webhook => {
                             Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
 
                             fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
@@ -107,7 +106,7 @@ export class Events {
                     if (!(compareStrings(response.data.translations[0].text, message.content) > STRINGS_SIMILARITY_LIMIT)) {
 
                         if (!Main.Data.webhooks.filter(hook => hook.channel == message.channelId).length) {
-                            await (message.channel as TextChannel).createWebhook(`Webhook #${message.channelId}`).then(async webhook => {
+                            await (message.channel as TextChannel).createWebhook({ name: `Webhook #${message.channelId}` }).then(async webhook => {
                                 Main.Data.webhooks.push({"channel": message.channelId, "id": webhook.id, "token": webhook.token});
         
                                 fs.writeFileSync(`${dirname(import.meta.url)}/../data.json`, JSON.stringify(Main.Data));
